@@ -2,15 +2,14 @@
 // Run from project root: `node scripts/verify.mjs` (also works from anywhere).
 // Exit 0 = document.scrollWidth <= viewport width at ALL three widths.
 //
-// Note: the page links its stylesheet with absolute paths (/styles.css), so the
-// check serves dist/ over a local micro HTTP server — under file:// those links
-// would silently 404 and the check would pass vacuously.
+// Note: the page links its stylesheet with absolute paths (/css/styles.css), so
+// the check serves dist/ over a local micro HTTP server — under file:// those
+// links would silently 404 and the check would pass vacuously.
 //
 // Browsers are installed HERMETICALLY (`PLAYWRIGHT_BROWSERS_PATH=0` → binaries
 // live in node_modules/playwright-core/.local-browsers, inside the project).
 import process from "node:process";
 import nodeFs from "node:fs";
-import { chromium } from "playwright";
 import http from "node:http";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,27 +25,43 @@ if (!nodeFs.existsSync(INDEX)) {
 
 // Serve dist/ locally so absolute-path asset links resolve correctly.
 const PORT = 8199;
+const notFound = new Set(); // request URLs that 404'd — a built page must request only assets that exist
 const server = http.createServer((req, res) => {
   const rel = req.url === "/" ? "index.html" : req.url.replace(/^\//, "").split("?")[0];
   const abs = join(DIST, rel);
-  if (!abs.startsWith(DIST) || !nodeFs.existsSync(abs) || nodeFs.isDirectory(abs)) {
+  if (!abs.startsWith(DIST) || !nodeFs.existsSync(abs) || nodeFs.lstatSync(abs).isDirectory()) {
+    notFound.add(req.url);
     res.statusCode = 404;
     res.end("not found");
     return;
   }
+  const MIME = { css: "text/css", html: "text/html; charset=utf-8", woff2: "font/woff2", woff: "font/woff", js: "text/javascript", svg: "image/svg+xml", json: "application/json", ico: "image/x-icon" };
+  const ext = abs.split(".").pop().toLowerCase();
+  res.setHeader("content-type", MIME[ext] || "application/octet-stream");
   res.end(nodeFs.readFileSync(abs));
 });
 server.listen(PORT, "127.0.0.1");
 
-process.env.PLAYWRIGHT_BROWSERS_PATH = "0"; // hermetic: node_modules/.../.local-browsers
+// Imported here (not at the top) so PLAYWRIGHT_BROWSERS_PATH is already set when
+// the playwright module initializes — static imports run before the body, which
+// would make the env assignment on this line too late.
+process.env.PLAYWRIGHT_BROWSERS_PATH = "0"; // hermetic: node_modules/playwright-core/.local-browsers
+const { chromium } = await import("playwright");
 
 const browser = await chromium.launch();
 const VIEWPORTS = [375, 768, 1440];
 let failures = 0;
 
 for (const width of VIEWPORTS) {
-  const page = await browser.newPage({ viewport: { width, height: 1000 } });
+  const page = await browser.newPage();
+  await page.setViewportSize({ width, height: 1000 }); // docs: set viewport size before navigating
   await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: "load" });
+  if (notFound.size) {
+    failures++;
+    console.log(`[viewport ${width}] FAIL (${notFound.size} missing asset(s)) — ${[...notFound].join(", ")} 404'd: dist links to assets that do not exist in dist/`);
+    await page.close();
+    continue;
+  }
   const m = await page.evaluate(() => {
     const doc = document.documentElement;
     const vw = doc.clientWidth;
@@ -76,7 +91,7 @@ await browser.close();
 server.close();
 
 if (failures > 0) {
-  console.error(`verify.mjs: FAIL — ${failures} viewport(s) had horizontal overflow`);
+  console.error(`verify.mjs: FAIL — ${failures} viewport(s) failed (horizontal overflow or missing assets)`);
   process.exit(1);
 }
 console.log("verify.mjs: PASS at 375/768/1440");
