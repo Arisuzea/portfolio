@@ -9,7 +9,7 @@
 // Browsers are installed HERMETICALLY (`PLAYWRIGHT_BROWSERS_PATH=0` → binaries
 // live in node_modules/playwright-core/.local-browsers, inside the project).
 import process from "node:process";
-import { nodeFs } from "node:fs";
+import nodeFs from "node:fs";
 import { chromium } from "playwright";
 import http from "node:http";
 import { join, dirname } from "node:path";

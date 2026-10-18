@@ -7,7 +7,7 @@ copy is **PLACEHOLDER** text in `content.json` — you paste the real content in
 the morning, then push the repo yourself. The site was **not** deployed or
 pushed by the overnight mission (by design).
 
-Layout: `src/index.astro` (single page) · `public/styles.css` (the one
+Layout: `src/pages/index.astro` (single page) · `public/css/styles.css` (the one
 stylesheet) · `astro.config.mjs` · `content.json` (all copy) · `DESIGN.md`
 (tokens, motion, rationale) · `scripts/verify.mjs` (Playwright overflow check)
 · `scripts/check-placeholders.mjs` (placeholder guard) · `.github/workflows/deploy.yml`
@@ -45,7 +45,7 @@ handle everywhere; user-page style — the repo **must** be named
 ## Fill in content
 
 Every visible string lives in `content.json` at the project root, read at build
-time by `src/index.astro`. Edit points (replace each `"PLACEHOLDER …"` value —
+time by `src/pages/index.astro`. Edit points (replace each `"PLACEHOLDER …"` value —
 the guard `node scripts/check-placeholders.mjs` then reports FAIL, which is the
 expected post-edit state):
 

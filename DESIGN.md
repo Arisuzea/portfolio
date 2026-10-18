@@ -6,7 +6,7 @@ hover micro-interactions. All copy placeholder (`content.json`).
 
 ## Color tokens
 
-Defined in `:root` of `public/styles.css` (the single stylesheet):
+Defined in `:root` of `public/css/styles.css` (the single stylesheet):
 
 | Token | Value | Use |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ purple/magenta-purple; neutral grays carry no hue. Well above the 90% bar.
   + letter-spacing carry the hierarchy.
 - Body/UI: **Spline Sans Mono Variable** (`wght` axis 100–800) — mechanical
   mono suits a punk-technical vibe and keeps CJK-free placeholder text honest.
-- Both vendored via Fontsource npm packages imported in `src/index.astro`
+- Both vendored via Fontsource npm packages imported in `src/pages/index.astro`
   (Astro bundles the CSS + woff2 into `dist/`; no runtime CDN — criterion 9).
 
 ## Motion specs
@@ -64,7 +64,7 @@ purple/magenta-purple; neutral grays carry no hue. Well above the 90% bar.
 
 Non-default choices vs idiomatic Astro + CSS (spec §4 "stack freedom" audit):
 
-1. **Stylesheet lives in `publicDir` (`public/styles.css`), not a `<style>` block
+1. **Stylesheet lives in `publicDir` (`public/css/styles.css`), not a `<style>` block
    or `src/**/*.css` import.** Astro 5.18.2 has no way to keep built page CSS
    un-minified (no `--no-minify` in `astro build --help`; no `minify` key in the
    configuration reference), and Astro minifies any bundled stylesheet — minified
