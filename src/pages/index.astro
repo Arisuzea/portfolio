@@ -1,0 +1,72 @@
+---
+import "@fontsource/anton";
+import "@fontsource-variable/spline-sans-mono";
+
+// All human-visible copy comes from content.json at project root (read at build time).
+import { readFile } from "node:fs/promises";
+import process from "node:process";
+
+// fs.readFile takes a plain path (a stringified file:// URL is NOT accepted).
+const C = JSON.parse(await readFile(`${process.cwd()}/content.json`, "utf8"));
+const { hero, about, projects, links } = C;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{hero.name} — {hero.role}</title>
+    <meta name="description" content={hero.tagline} />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <span class="nav-brand">{hero.name}</span>
+      <nav class="nav-links">
+        <a class="nav-a" href="#about">{about.heading}</a>
+        <a class="nav-a" href="#projects">{projects.heading}</a>
+        <a class="nav-a" href="#links">{links.heading}</a>
+      </nav>
+    </header>
+
+    <section id="hero" class="hero">
+      <p class="hero-status">{hero.status}</p>
+      <h1 class="hero-name">{hero.name}</h1>
+      <p class="hero-role">{hero.role}</p>
+      <p class="hero-tag">{hero.tagline}</p>
+      <a class="cta" href="#projects">{hero.cta}<span class="cta-arrow">↓</span></a>
+    </section>
+
+    <section id="about" class="about">
+      <h2 class="sec-heading">{about.heading}</h2>
+      <p class="about-blurb">{about.blurb}</p>
+      <div class="role-card">{about.roleLabel}</div>
+    </section>
+
+    <section id="projects" class="projects">
+      <h2 class="sec-heading">{projects.heading}</h2>
+      <p class="sec-blurb">{projects.blurb}</p>
+      <div class="card-grid">
+        {projects.items.map((p) => (
+          <a class="card" href={p.url}>
+            <h3 class="card-title">{p.title}</h3>
+            <p class="card-blurb">{p.blurb}</p>
+            <span class="card-tag">{p.tag}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="links" class="links">
+      <h2 class="sec-heading">{links.heading}</h2>
+      <p class="sec-blurb">{links.blurb}</p>
+      <div class="link-hub">
+        {links.items.map((l) => (
+          <a class="chip" href={l.url}>{l.label}</a>
+        ))}
+      </div>
+      <a class="email-link" href={links.email}>{links.emailLabel}</a>
+    </section>
+  </body>
+</html>

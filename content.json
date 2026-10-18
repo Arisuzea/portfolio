@@ -1,0 +1,57 @@
+{
+  "hero": {
+    "name": "PLACEHOLDER your name",
+    "role": "PLACEHOLDER your role",
+    "tagline": "PLACEHOLDER one-line tagline",
+    "status": "PLACEHOLDER status line",
+    "cta": "PLACEHOLDER scroll to work"
+  },
+  "about": {
+    "heading": "PLACEHOLDER about heading",
+    "blurb": "PLACEHOLDER two or three sentences about you.",
+    "roleLabel": "PLACEHOLDER about card label"
+  },
+  "projects": {
+    "heading": "PLACEHOLDER projects heading",
+    "blurb": "PLACEHOLDER one line intro for the grid.",
+    "items": [
+      {
+        "title": "PLACEHOLDER project one",
+        "blurb": "PLACEHOLDER what it does.",
+        "tag": "PLACEHOLDER tag",
+        "url": "PLACEHOLDER-url-project-one"
+      },
+      {
+        "title": "PLACEHOLDER project two",
+        "blurb": "PLACEHOLDER what it does.",
+        "tag": "PLACEHOLDER tag",
+        "url": "PLACEHOLDER-url-project-two"
+      },
+      {
+        "title": "PLACEHOLDER project three",
+        "blurb": "PLACEHOLDER what it does.",
+        "tag": "PLACEHOLDER tag",
+        "url": "PLACEHOLDER-url-project-three"
+      },
+      {
+        "title": "PLACEHOLDER project four",
+        "blurb": "PLACEHOLDER what it does.",
+        "tag": "PLACEHOLDER tag",
+        "url": "PLACEHOLDER-url-project-four"
+      }
+    ]
+  },
+  "links": {
+    "heading": "PLACEHOLDER links heading",
+    "blurb": "PLACEHOLDER pick a door.",
+    "email": "PLACEHOLDER-email-placeholder@example.invalid",
+    "emailLabel": "PLACEHOLDER email slot",
+    "items": [
+      { "label": "PLACEHOLDER github", "url": "PLACEHOLDER-url-github" },
+      { "label": "PLACEHOLDER linkedin", "url": "PLACEHOLDER-url-linkedin" },
+      { "label": "PLACEHOLDER x", "url": "PLACEHOLDER-url-x" },
+      { "label": "PLACEHOLDER instagram", "url": "PLACEHOLDER-url-instagram" },
+      { "label": "PLACEHOLDER bandcamp", "url": "PLACEHOLDER-url-bandcamp" }
+    ]
+  }
+}
