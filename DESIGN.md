@@ -2,7 +2,9 @@
 
 Neon-punk single scrolling page: hero → about → projects card grid → links hub.
 Dark ground, dominant purple accents, punk-brute display type, mono body, modern
-hover micro-interactions. All copy placeholder (`content.json`).
+hover micro-interactions, phase-2 ambient neon background + scroll-linked motion.
+All copy comes from `content.json` (real content since phase 2; social/email slots
+stay `PLACEHOLDER`).
 
 ## Color tokens
 
@@ -38,7 +40,8 @@ purple/magenta-purple; neutral grays carry no hue. Well above the 90% bar.
 
 - Every interactive element (nav items, CTA button, role card, project cards,
   card title/tag sub-elements, link chips, email link) has a `:hover` rule — 8
-  distinct rules total; **each hover block re-declares its `transition`** so the
+  distinct rules in the phase-1 set; phase 2 adds a scrollbar-thumb hover, 9
+  total; **each hover block re-declares its `transition`** so the
   built CSS passes per-rule greps.
 - Durations: 150–220 ms, all `ease-out` (spec §4 band is 150–300 ms).
 - Hover vocabulary: `translateY(-2..-4px)` lift, `translateX` tag nudge, `scale(1.015)`,
@@ -46,9 +49,32 @@ purple/magenta-purple; neutral grays carry no hue. Well above the 90% bar.
 - `:focus-visible` universal ring: 2px `--accent-hot` outline, 3px offset.
 - `@media (prefers-reduced-motion: reduce)` sets `animation: none !important`
   and `transition: none !important` on `*` (+ pseudo-elements) — all motion
-  neutralized. No ambient loops exist, so the guard is the only motion kill-switch.
+  neutralized. Phase 1 had no ambient loops; phase 2's layers/reveals are stopped
+  by the same universal block (`animation: none` also clears scroll-driven
+  timelines), and it stays the LAST section of the stylesheet.
 - Gritty texture: inline SVG `feTurbulence` grain (data URI, zero requests) +
   4px scanline `repeating-linear-gradient`. Decorative, no animation.
+
+## Phase-2 motion
+
+CSS-only (zero JS, zero new runtime assets — criterion §3-10). All new `@keyframes`
+are `bg-`/`scroll-` prefixed. Ambient layer budget: 2 of 3 (spec §4). Sources: MDN
+scroll-driven animations guide (via `animation-timeline` reference), `@supports`
+at-rule reference, `::-webkit-scrollbar` reference.
+
+| Layer / effect | Element | Motion | Duration / parallax | Fallback |
+| --- | --- | --- | --- | --- |
+| Ambient glow | `.bg-layer` (fixed, `inset: 0`, z-index −2, `pointer-events: none`, `overflow: hidden`) | 3 radial purple glows (tokens rgba, alphas 0.16–0.22 ≤ 0.25 rule), drift via `@keyframes bg-drift` — scale(1.12) constant + translate3d ≤ 2vw/1.5vh, transform-only | 90s linear infinite `alternate` | layer visible at rest; no guard needed (animation is the only motion on it) |
+| Scroll parallax | `.bg-grid` (fixed, `inset: 0`, z-index −1) | synthwave 72px grid pans one tile across root scroll via `@keyframes scroll-grid-pan` + `animation-timeline: scroll(root block)` | parallax ≈ 72px per full scroll (factor ~0.06×), scale(1.06) keeps edges covered | wrapped in `@supports (animation-timeline: scroll(root block))` — non-supporting browsers: grid static, fully visible |
+| Section reveals | `.sec-heading` `.sec-blurb` `.about-blurb` `.card-grid` `.link-hub` (wrappers only — never a hover-transform element, so phase-1 hovers stay intact) | `@keyframes scroll-reveal`: opacity 0→1 + translateY 12→0 | `animation-timeline: view()`, `animation-range: entry 0% entry 55%`, `fill both` | `@supports (animation-timeline: view())` guard; base (unguarded) opacity is 1 → failure mode "no motion", never "invisible content" |
+| Hero entrance | `.hero-status` + `.hero-name` | one-time `scroll-hero-in`: opacity 0→1, letter-spacing easing back to each element's base, translateY 10→0 | 550ms ease-out, fill both (≤ 600ms band) | time-based; with reduced-motion the universal kill-switch leaves elements at base style |
+| Neon scrollbar | `::-webkit-scrollbar` + `-track` + `-thumb` (thumb gradient `--accent`→`--accent-hot`, track `--bg-raise`, 10px + 2px transparent-border inset) | hover: thumb → `--accent-hot` (9th `:hover` rule) | n/a | Firefox et al.: standard `scrollbar-color`/`scrollbar-width` inside `@supports not selector(::-webkit-scrollbar)` (MDN's fallback pattern; set only where the pseudo-element is absent so it never overrides webkit styling per MDN's override warning) |
+
+Overflow safety: both fixed layers are `inset: 0`, `overflow: hidden`, transforms
+bounded and constant-scale-padded — fixed elements never contribute to the
+document's scrollable area. `scripts/verify.mjs` now additionally asserts
+`getComputedStyle(section).opacity >= 0.99` for the four section ids at scrollY 0
+(§11-6 base-visible check); existing 375/768/1440 overflow checks untouched.
 
 ## Layout / overflow strategy
 
@@ -92,6 +118,12 @@ Non-default choices vs idiomatic Astro + CSS (spec §4 "stack freedom" audit):
 6. **Fonts imported in frontmatter (`import "@fontsource/anton"`) rather than
    hand-copied woff2.** Fontsource npm + Astro CSS import is the documented
    vendoring path (spec §5); Astro rewrites the woff2 URLs to local hashed paths.
+7. **Phase 2: `compressHTML: false` in `astro.config.mjs`.** Astro 5.18.2 minifies
+   built HTML by default (`compressHTML` defaults to true per the configuration
+   reference), collapsing `dist/index.html` to one line — that makes criterion
+   §11-2's `grep -c '<four project URLs>' ≥ 4` unsatisfiable (one physical line can
+   match once). `compressHTML: false` is the documented Astro switch; cost is a few
+   KB of whitespace in a 1-page dist, and `site`/`base` stay untouched.
 
 ## Anti-decisions
 

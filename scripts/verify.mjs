@@ -24,10 +24,18 @@ if (!nodeFs.existsSync(INDEX)) {
 }
 
 // Serve dist/ locally so absolute-path asset links resolve correctly.
+// Phase-2: with astro.config base: "/portfolio", the built page requests assets at
+// /portfolio/... (Astro rewrites generated URLs to include the base). GH Pages serves
+// dist/ AT that base path, so the micro-server mirrors the deployment: strip the base
+// prefix before resolving inside dist/. Assets that genuinely do not exist in dist/
+// still 404 and are still recorded by the guard.
 const PORT = 8199;
+const SITE_BASE = "/portfolio"; // keep in sync with astro.config.mjs base
 const notFound = new Set(); // request URLs that 404'd — a built page must request only assets that exist
 const server = http.createServer((req, res) => {
-  const rel = req.url === "/" ? "index.html" : req.url.replace(/^\//, "").split("?")[0];
+  let path = req.url.split("?")[0];
+  if (path === SITE_BASE || path.startsWith(SITE_BASE + "/")) path = path.slice(SITE_BASE.length) || "/";
+  const rel = path === "/" ? "index.html" : path.replace(/^\//, "");
   const abs = join(DIST, rel);
   if (!abs.startsWith(DIST) || !nodeFs.existsSync(abs) || nodeFs.lstatSync(abs).isDirectory()) {
     notFound.add(req.url);
@@ -72,17 +80,32 @@ for (const width of VIEWPORTS) {
         offenders.push(`${el.tagName}.${String(el.className || "_")}:${Math.round(r.right)}:${Math.round(r.left)}`);
       }
     });
+    // Phase-2 §11-6: base-visible fallback — at scrollY 0 (fresh load, no scroll) every
+    // section element must report computed opacity >= 0.99. The reveal animations live on
+    // wrapper children inside the sections, never on the sections themselves, so an
+    // invisible section means the @supports fallback regressed to "invisible content".
+    const sections = ["hero", "about", "projects", "links"].map((id) => {
+      const el = document.getElementById(id);
+      return { id, opacity: el ? Number(getComputedStyle(el).opacity) : 0 };
+    });
     return {
       scrollWidth: doc.scrollWidth,
       clientWidth: vw,
       offenders: offenders.slice(0, 10),
+      sections,
     };
   });
   const ok = m.scrollWidth <= width;
+  const dimSections = m.sections.filter((s) => s.opacity < 0.99);
   console.log(`[viewport ${width}] document.scrollWidth=${m.scrollWidth} viewport=${width} -> ${ok ? "PASS" : "FAIL (horizontal overflow)"}`);
+  console.log(`[viewport ${width}] section opacity at scrollY 0: ${m.sections.map((s) => `${s.id}=${s.opacity}`).join(" ")} -> ${dimSections.length ? "FAIL (invisible section)" : "PASS (base-visible fallback)"}`);
   if (!ok) {
     failures++;
     if (m.offenders.length) console.log(`  offenders: ${m.offenders.join(", ")}`);
+  }
+  if (dimSections.length) {
+    failures++;
+    console.log(`  dim sections: ${dimSections.map((s) => `${s.id} opacity=${s.opacity}`).join(", ")}`);
   }
   await page.close();
 }

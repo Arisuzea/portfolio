@@ -1,53 +1,53 @@
 {
   "hero": {
-    "name": "PLACEHOLDER your name",
-    "role": "PLACEHOLDER your role",
-    "tagline": "PLACEHOLDER one-line tagline",
-    "status": "PLACEHOLDER status line",
-    "cta": "PLACEHOLDER scroll to work"
+    "name": "Conde Reister Gerald",
+    "role": "Full-Stack Developer",
+    "tagline": "In the age of AI, your advantage should be knowing how to organize them",
+    "status": "Available",
+    "cta": "See the work"
   },
   "about": {
-    "heading": "PLACEHOLDER about heading",
-    "blurb": "PLACEHOLDER two or three sentences about you.",
-    "roleLabel": "PLACEHOLDER about card label"
+    "heading": "About",
+    "blurb": "A computer science student specializing in AI — my workflow stays efficient because the AI agents I build grow alongside my work.",
+    "roleLabel": "AI × CS"
   },
   "projects": {
-    "heading": "PLACEHOLDER projects heading",
-    "blurb": "PLACEHOLDER one line intro for the grid.",
+    "heading": "Work",
+    "blurb": "Mods, tools, and apps I've built.",
     "items": [
       {
-        "title": "PLACEHOLDER project one",
-        "blurb": "PLACEHOLDER what it does.",
-        "tag": "PLACEHOLDER tag",
-        "url": "PLACEHOLDER-url-project-one"
+        "title": "PunkCity",
+        "blurb": "A modlist website for Cyberpunk 2077.",
+        "tag": "web",
+        "url": "http://punkcity.vercel.app/"
       },
       {
-        "title": "PLACEHOLDER project two",
-        "blurb": "PLACEHOLDER what it does.",
-        "tag": "PLACEHOLDER tag",
-        "url": "PLACEHOLDER-url-project-two"
+        "title": "Lingering Subtitles Fix",
+        "blurb": "Skyrim C++ mod that fixes subtitle issues.",
+        "tag": "C++ / Skyrim",
+        "url": "https://github.com/Arisuzea/Lingering-Subtitles-Fix"
       },
       {
-        "title": "PLACEHOLDER project three",
-        "blurb": "PLACEHOLDER what it does.",
-        "tag": "PLACEHOLDER tag",
-        "url": "PLACEHOLDER-url-project-three"
+        "title": "Dialogue Scrolling Fix",
+        "blurb": "Skyrim C++ mod that addresses dialogue/camera issues.",
+        "tag": "C++ / Skyrim",
+        "url": "https://github.com/Arisuzea/Dialogue-Scrolling-Fix"
       },
       {
-        "title": "PLACEHOLDER project four",
-        "blurb": "PLACEHOLDER what it does.",
-        "tag": "PLACEHOLDER tag",
-        "url": "PLACEHOLDER-url-project-four"
+        "title": "EduQuiz",
+        "blurb": "A gamified quizzing app built during my SHS days.",
+        "tag": "gamification",
+        "url": "https://github.com/Arisuzea/EduQUIZ---Research-Project"
       }
     ]
   },
   "links": {
-    "heading": "PLACEHOLDER links heading",
-    "blurb": "PLACEHOLDER pick a door.",
+    "heading": "Elsewhere",
+    "blurb": "Pick a door.",
     "email": "PLACEHOLDER-email-placeholder@example.invalid",
     "emailLabel": "PLACEHOLDER email slot",
     "items": [
-      { "label": "PLACEHOLDER github", "url": "PLACEHOLDER-url-github" },
+      { "label": "GitHub", "url": "https://github.com/ArisuZeA?tab=repositories" },
       { "label": "PLACEHOLDER linkedin", "url": "PLACEHOLDER-url-linkedin" },
       { "label": "PLACEHOLDER x", "url": "PLACEHOLDER-url-x" },
       { "label": "PLACEHOLDER instagram", "url": "PLACEHOLDER-url-instagram" },

@@ -352,6 +352,133 @@ h3 {
   transition: color 150ms ease-out, text-shadow 150ms ease-out;
 }
 
+/* ---------- Phase-2: ambient background ---------- */
+/* Two fixed layers (budget: 2 of max 3). inset:0 + overflow:hidden + pointer-events:none +
+   negative z-index; fixed positioning never extends the scrollable area (spec §12 overflow
+   safety). Transforms are translate/scale-only — no layout-triggering props. Glow rgba alphas
+   stay <= 0.22 (< the 0.25-per-layer rule), purple tokens only. */
+
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background-image:
+    radial-gradient(42vw 46vh at 24% 16%, rgba(168, 85, 247, 0.22), transparent 62%),
+    radial-gradient(38vw 40vh at 80% 34%, rgba(217, 70, 239, 0.18), transparent 60%),
+    radial-gradient(48vw 52vh at 46% 92%, rgba(168, 85, 247, 0.16), transparent 66%);
+  animation: bg-drift 90s linear infinite alternate;
+}
+
+@keyframes bg-drift {
+  from { transform: scale(1.12) translate3d(0, 0, 0); }
+  to { transform: scale(1.12) translate3d(-2vw, -1.5vh, 0); }
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 70, 239, 0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+@keyframes scroll-grid-pan {
+  from { transform: scale(1.06) translate3d(0, -72px, 0); }
+  to { transform: scale(1.06) translate3d(0, 0, 0); }
+}
+
+/* scroll-linked parallax: grid pans one 72px tile across the root scroll
+   (parallax factor ~0.06x). Guarded per spec §6: without scroll-driven support the
+   grid simply stays put — base state fully visible, failure mode is "no motion".
+   MDN note: animation-timeline must come AFTER the animation shorthand (the shorthand
+   resets it to auto). */
+@supports (animation-timeline: scroll(root block)) {
+  .bg-grid {
+    animation: scroll-grid-pan 1ms linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100%;
+  }
+}
+
+/* one-time hero entrance (<= 600ms, spec §4c): opacity + letter-spacing easing to
+   each element's own base (properties absent from the 100% keyframe revert to the
+   underlying style per css-animations). Time-based, not scroll-driven; the scroll-
+   prefix only keeps phase-2 keyframes one greppable family. */
+.hero-status,
+.hero-name {
+  animation: scroll-hero-in 550ms ease-out both;
+}
+
+@keyframes scroll-hero-in {
+  from { opacity: 0; letter-spacing: 0.3em; transform: translate3d(0, 10px, 0); }
+  to { opacity: 1; }
+}
+
+/* ---------- Phase-2: scroll reveals ---------- */
+/* view() timeline reveals on wrapper selectors ONLY (.sec-heading/.sec-blurb/.about-blurb/
+   .card-grid/.link-hub) — never on elements that carry hover transforms, so the phase-1
+   hover micro-interactions stay composited. Base (unguarded) state: opacity 1 — the
+   @supports fallback is "no motion", never "invisible content". animation-range entry
+   0%→55% = reveal while the wrapper enters the scrollport (MDN timeline-range names:
+   entry/cover/contain/exit). 1ms duration is the MDN guidance constant for scroll timelines
+   (time is ignored; scroll position drives progress). */
+@keyframes scroll-reveal {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@supports (animation-timeline: view()) {
+  .sec-heading,
+  .sec-blurb,
+  .about-blurb,
+  .card-grid,
+  .link-hub {
+    animation: scroll-reveal 1ms linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+
+/* ---------- Phase-2: scrollbar ---------- */
+/* MDN ::-webkit-scrollbar family (non-standard, WebKit/Chromium): whole bar, track, thumb.
+   2px transparent border insets the thumb. Purple tokens only. */
+::-webkit-scrollbar {
+  width: 10px;
+  border: 2px solid transparent;
+  background: var(--bg-raise);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-raise);
+  border: 2px solid var(--line);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent), var(--accent-hot));
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hot);
+}
+
+/* Standard-property fallback for engines without the pseudo-element (e.g. Firefox).
+   MDN warns scrollbar-color != auto OVERRIDES ::-webkit-scrollbar styling, so it is set
+   only where the pseudo-element does not exist — @supports not selector() per MDN @supports. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--accent-hot) var(--bg-raise);
+    scrollbar-width: thin;
+  }
+}
+
 /* ---------- reduced motion: kill all motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
