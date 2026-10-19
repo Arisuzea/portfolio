@@ -16,9 +16,10 @@ stylesheet) · `astro.config.mjs` · `content.json` (all copy) · `DESIGN.md`
 ## Local commands
 
 ```sh
+node_modules/.bin/astro dev   # live preview at http://localhost:4321 (hot-reloads content.json edits)
 npm run build           # astro build → dist/ (must exist; ≤ 512 KB budget)
-node scripts/verify.mjs # Playwright overflow check @ 375/768/1440 px
-node scripts/check-placeholders.mjs  # asserts every content.json string starts with PLACEHOLDER
+npm run verify          # node scripts/verify.mjs — Playwright overflow check @ 375/768/1440 px
+npm run check-content   # node scripts/check-placeholders.mjs — asserts every content.json string starts with PLACEHOLDER
 ```
 
 ## Deploy (morning)
