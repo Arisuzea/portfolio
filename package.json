@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "Single-page neon-punk personal site (Astro). All copy is PLACEHOLDER text.",
   "scripts": {
+    "dev": "astro dev",
     "build": "astro build",
+    "preview": "astro preview",
     "verify": "node scripts/verify.mjs",
     "check-content": "node scripts/check-placeholders.mjs"
   },
